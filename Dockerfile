@@ -1,12 +1,19 @@
-FROM haroldli/xiaoya-tvbox:latest
+FROM haroldli/alist-base:latest
 
 LABEL MAINTAINER="Har01d"
 
+ENV MEM_OPT="-Xmx512M"
 
-VOLUME /root/data/
+COPY init.sh /
+COPY movie.sh /
+COPY entrypoint.sh /
 
-WORKDIR /app
-USER root
+COPY target/application/ ./
 
-EXPOSE 4567
+COPY data/version data/app_version
 
+EXPOSE 4567 80
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["81", "--spring.profiles.active=production,xiaoya"]
