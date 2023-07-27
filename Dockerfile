@@ -9,9 +9,10 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 COPY --from=corretto-jdk /jre $JAVA_HOME
 
-VOLUME /opt/atv/data/
+VOLUME /opt/xiaoya/data/
 
-WORKDIR /opt/atv/
+WORKDIR /app
+USER root
 
 COPY target/alist-tvbox-1.0.jar ./alist-tvbox.jar
 
