@@ -9,7 +9,7 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 COPY --from=corretto-jdk /jre $JAVA_HOME
 
-VOLUME /opt/xiaoya/data/
+VOLUME /root/data/
 
 WORKDIR /app
 USER root
