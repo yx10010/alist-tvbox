@@ -1,4 +1,4 @@
-FROM haroldli/java:17 as corretto-jdk
+FROM haroldli/xiaoya-tvbox:latest
 
 FROM alpine:latest
 
