@@ -9,7 +9,7 @@ COPY movie.sh /
 COPY entrypoint.sh /
 
 
-EXPOSE 4567 80
+EXPOSE 4567
 
 ENTRYPOINT ["/entrypoint.sh"]
 
