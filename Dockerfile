@@ -2,7 +2,7 @@ FROM haroldli/xiaoya-tvbox:latest
 
 FROM alpine:latest
 
-FROM openjdk:8
+FROM corretto-jdk
 
 LABEL MAINTAINER="Har01d"
 
