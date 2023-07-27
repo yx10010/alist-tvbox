@@ -2,6 +2,8 @@ FROM haroldli/xiaoya-tvbox:latest
 
 FROM alpine:latest
 
+FROM openjdk:8
+
 LABEL MAINTAINER="Har01d"
 
 ENV JAVA_HOME=/jre
