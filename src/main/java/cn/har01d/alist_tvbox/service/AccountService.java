@@ -48,7 +48,11 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
@@ -464,14 +468,19 @@ public class AccountService {
                     }
                     if (account.isShowMyAli()) {
                         log.info("enable AList storage {}", id, name);
-                        sql = "INSERT INTO x_storages VALUES(" + id + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\"}','','2023-06-15 12:00:00+00:00',0,'name','ASC','',0,'302_redirect','');";
+                        sql = "INSERT INTO x_storages VALUES(" + id + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "/资源盘',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\",\"rorb\":\"r\"}','','2023-06-15 12:00:00+00:00',0,'name','ASC','',0,'302_redirect','');";
+                        statement.executeUpdate(sql);
+                        sql = "INSERT INTO x_storages VALUES(" + (id + 1) + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "/备份盘',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\",\"rorb\":\"b\"}','','2023-06-15 12:00:00+00:00',0,'name','ASC','',0,'302_redirect','');";
+                        statement.executeUpdate(sql);
                         log.info("add AList storage {} {}", id, name);
                     } else {
                         sql = "DELETE FROM x_storages WHERE id = " + id;
+                        statement.executeUpdate(sql);
+                        sql = "DELETE FROM x_storages WHERE id = " + id + 1;
+                        statement.executeUpdate(sql);
                         log.info("remove AList storage {} {}", id, name);
                     }
-                    statement.executeUpdate(sql);
-                    id++;
+                    id += 2;
                 } catch (Exception e) {
                     log.warn("", e);
                 }
@@ -829,7 +838,7 @@ public class AccountService {
     }
 
     public void showMyAli(Account account) {
-        int storageId = 9999 + account.getId();
+        int storageId = 10000 + (account.getId() - 1) * 2;
         try (Connection connection = DriverManager.getConnection(Constants.DB_URL);
              Statement statement = connection.createStatement()) {
             String name = account.getNickname();
@@ -837,7 +846,10 @@ public class AccountService {
                 name = String.valueOf(account.getId());
             }
             if (account.isShowMyAli()) {
-                String sql = "INSERT INTO x_storages VALUES(" + storageId + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\"}','','2023-06-15 12:00:00+00:00',0,'name','ASC','',0,'302_redirect','');";
+                String sql = "INSERT INTO x_storages VALUES(" + storageId + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "/资源盘',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\",\"rorb\":\"r\"}','','2023-06-15 12:00:00+00:00',0,'name','ASC','',0,'302_redirect','');";
+                statement.executeUpdate(sql);
+                storageId++;
+                sql = "INSERT INTO x_storages VALUES(" + storageId + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "/备份盘',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\",\"rorb\":\"b\"}','','2023-06-15 12:00:00+00:00',0,'name','ASC','',0,'302_redirect','');";
                 statement.executeUpdate(sql);
                 log.info("add AList storage {}", name);
             }
@@ -853,9 +865,10 @@ public class AccountService {
         }
 
         String token = status == 2 ? login() : "";
-        int storageId = 9999 + account.getId();
+        int storageId = 10000 + (account.getId() - 1) * 2;
         if (status == 2) {
             deleteStorage(storageId, token);
+            deleteStorage(storageId + 1, token);
         }
 
         try (Connection connection = DriverManager.getConnection(Constants.DB_URL);
@@ -865,11 +878,14 @@ public class AccountService {
                 name = String.valueOf(account.getId());
             }
             if (account.isShowMyAli()) {
-                String sql = "INSERT INTO x_storages VALUES(" + storageId + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\"}','','2023-06-15 12:00:00+00:00',1,'name','ASC','',0,'302_redirect','');";
+                String sql = "INSERT INTO x_storages VALUES(" + storageId + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "/资源盘',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\",\"rorb\":\"r\"}','','2023-06-15 12:00:00+00:00',1,'name','ASC','',0,'302_redirect','');";
+                statement.executeUpdate(sql);
+                sql = "INSERT INTO x_storages VALUES(" + (storageId + 1) + ",'/\uD83D\uDCC0我的阿里云盘/" + name + "/备份盘',0,'AliyundriveOpen',30,'work','{\"root_folder_id\":\"root\",\"refresh_token\":\"" + account.getOpenToken() + "\",\"order_by\":\"name\",\"order_direction\":\"ASC\",\"oauth_token_url\":\"https://api.nn.ci/alist/ali_open/token\",\"client_id\":\"\",\"client_secret\":\"\",\"rorb\":\"b\"}','','2023-06-15 12:00:00+00:00',1,'name','ASC','',0,'302_redirect','');";
                 statement.executeUpdate(sql);
                 log.info("add AList storage {}", name);
                 if (status == 2) {
                     enableStorage(storageId, token);
+                    enableStorage(storageId + 1, token);
                 }
             } else {
                 log.info("remove AList storage {}", name);
@@ -923,11 +939,34 @@ public class AccountService {
             map = getAliToken(account.getRefreshToken());
         }
         String accessToken = (String) map.get(ACCESS_TOKEN);
-        String driveId = (String) map.get("default_drive_id");
+        String driveId;
 
-        AliFileList list = getFileList(driveId, account.getFolderId(), accessToken);
+        AliFileList list;
+        try {
+            driveId = (String) getUserInfo(accessToken).get("resource_drive_id");
+            log.debug("use resource_drive_id {}", driveId);
+            list = getFileList(driveId, account.getFolderId(), accessToken);
+        } catch (Exception e) {
+            log.warn("{}", e.getMessage());
+            driveId = (String) map.get("default_drive_id");
+            log.debug("use default_drive_id {}", driveId);
+            list = getFileList(driveId, account.getFolderId(), accessToken);
+        }
+
+        log.debug("AliFileList: {}", list);
         List<AliFileItem> files = list.getItems().stream().filter(file -> !file.isHidden() && "file".equals(file.getType())).collect(Collectors.toList());
         return deleteFiles(driveId, files, accessToken);
+    }
+
+    private Map<String, Object> getUserInfo(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("User-Agent", Collections.singletonList(USER_AGENT));
+        headers.put("Referer", Collections.singletonList("https://www.aliyundrive.com/"));
+        headers.put("Authorization", Collections.singletonList("Bearer " + accessToken));
+        Map<String, Object> body = new HashMap<>();
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+        ResponseEntity<Map> response = restTemplate1.exchange("https://user.aliyundrive.com/v2/user/get", HttpMethod.POST, entity, Map.class);
+        return response.getBody();
     }
 
     private AliFileList getFileList(String driveId, String fileId, String accessToken) {

@@ -27,7 +27,11 @@
               row-key="id"
               :key="tableKey"
               style="width: 100%">
-      <el-table-column prop="order" label="顺序" sortable width="100"/>
+      <el-table-column prop="order" label="顺序" sortable width="100">
+        <template #default="scope">
+          <span class="pointer">{{scope.row.order}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="id" label="ID" sortable width="100"/>
       <el-table-column prop="name" label="名称" width="200"/>
       <el-table-column prop="value" label="值" sortable/>
@@ -151,6 +155,15 @@
             @change="updateSearchable"
           />
         </el-form-item>
+        <el-form-item label="强制dash视频格式">
+          <el-switch
+            v-model="dash"
+            inline-prompt
+            active-text="开启"
+            inactive-text="关闭"
+            @change="updateDash"
+          />
+        </el-form-item>
         <el-form-item label="视频格式">
           <el-checkbox v-model="checks[0]" label="HDR" size="large"/>
           <el-checkbox v-model="checks[1]" label="4K" size="large"/>
@@ -221,6 +234,7 @@ const checks = ref<boolean[]>([true, true, true, false, true, true])
 const userInfo = ref<any>({})
 const heartbeat = ref(false)
 const searchable = ref(false)
+const dash = ref(false)
 const updateAction = ref(false)
 const dialogTitle = ref('')
 const list = ref<Nav[]>([])
@@ -398,6 +412,12 @@ const updateSearchable = () => {
   })
 }
 
+const updateDash = () => {
+  axios.post('/settings', {name: 'bilibili_dash', value: dash.value + ''}).then(() => {
+    ElMessage.success('更新成功')
+  })
+}
+
 const updateFnval = () => {
   let val = 16
   let num = 64
@@ -487,6 +507,12 @@ const getSearchable = () => {
   })
 }
 
+const getDash = () => {
+  axios.get('/settings/bilibili_dash').then(({data}) => {
+    dash.value = data.value === 'true'
+  })
+}
+
 const getBilibiliCookie = () => {
   axios.get('/settings/bilibili_cookie').then(({data}) => {
     bilibiliCookie.value = data.value
@@ -500,7 +526,7 @@ const getFnval = () => {
       val = 2512
     }
     let num = 64
-    for (let i in checks.value) {
+    for (let i = 0; i < checks.value.length; i++) {
       checks.value[i] = (val & num) != 0
       num *= 2
     }
@@ -527,6 +553,7 @@ onMounted(() => {
   getHeartbeat()
   getSearchable()
   getBilibiliCookie()
+  getDash()
   getFnval()
   load().then(() => {
     rowDrop()
@@ -554,4 +581,7 @@ onMounted(() => {
   align-items: center;
 }
 
+.pointer {
+  cursor: pointer;
+}
 </style>

@@ -6,11 +6,10 @@
       <a href="https://github.com/power721/alist-tvbox" target="_blank">https://github.com/power721/alist-tvbox</a>
     </p>
     <p>
-      中文文档：
-      <a href="https://github.com/power721/alist-tvbox/blob/master/doc/README_zh.md" target="_blank">https://github.com/power721/alist-tvbox/blob/master/doc/README_zh.md</a>
+      中文文档：<a href="https://har01d.cn/#/notes/alist-tvbox" target="_blank">https://har01d.cn/#/notes/alist-tvbox</a>
     </p>
     <p>
-      <a href="https://har01d.cn/#/notes/alist-tvbox" target="_blank">https://har01d.cn/#/notes/alist-tvbox</a>
+      <a href="https://github.com/power721/alist-tvbox/blob/master/doc/README_zh.md" target="_blank">https://github.com/power721/alist-tvbox/blob/master/doc/README_zh.md</a>
     </p>
     <p>
       AList：
@@ -31,6 +30,10 @@
     <p>
       一键部署(小雅版)：
       <code>sudo bash -c "$(curl -fsSL https://d.har01d.cn/update_xiaoya.sh)"</code><br>
+    </p>
+    <p>
+      一键部署(开发版)：
+      <code>wget https://d.har01d.cn/update_xiaoya.sh -O update_xiaoya.sh && sh ./update_xiaoya.sh -t dev</code><br>
     </p>
     <p>
       一键部署(NAS)：
