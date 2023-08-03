@@ -18,4 +18,4 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["81", "--spring.profiles.active=production,xiaoya"]
 
-UESR 10001
+USER 10001
